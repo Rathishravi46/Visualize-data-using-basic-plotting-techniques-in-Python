@@ -1,50 +1,159 @@
-3. Visualize data using basic plotting techniques in Python.
+# Analysis-and-Visualization-of-COVID-19-Dataset
 
-The pandas library makes it extremely easy to create basic data visualizations and provides built-in utilities
- for all common data visualizations:
-•	df.plot.bar(...), to create a bar plot (or add an h for .barh for a horizontal bar chart)
-•	df.plot.line(...), to create a line plot
-•	df.plot.scatter(...), to create a scatter plot
-•	df.plot.hist(...), to create a histogram
-•	df.plot.box(...), to create a box plot
-•	...and df.plot.pie, df.plot.hexbin, and more.
-Selecting Columns for Visualizations
-By default, each visualization will display all numeric columns of data -- which is often A LOT of data. For example, the Illini Football Dataset contains four numeric columns: Season (ex: 2021), OpponentRank (ex: 3), IlliniScore (ex: 21), and OpponentScore (ex: 14).
- This means a default visualization will display all four columns:
-df = pd.read_csv("https://waf.cs.illinois.edu/discovery/football.csv")
-df.plot.box()
-df[ ["IlliniScore", "OpponentScore"] ]
- 
-To create a DataFrame with only a subset of the columns, we need to select a subset of columns. The syntax required to do this will provide the list of column names as an index to the DataFrame as shown below:
-Notice that there are two sets of square brackets!
-•	The first set tells us we're working within the df, as df[ ... ].
-•	The second set is the list of column names where each column name is separated by a comma ["IlliniScore", "OpponentScore"].
-•	Together, they make the full command to select a subset of columns from our DataFrame.
-A default box plot with only the two columns can now be created:
-df = pd.read_csv("https://waf.cs.illinois.edu/discovery/football.csv")
-df[ ["IlliniScore", "OpponentScore"] ].plot.box()
- 
-Box plot of only the IlliniScore and OpponentScore columns in the Illini Football Dataset. 
-By selecting a subset of the columns, we are able to focus on data with similar ranges.
-Specifying x and y Column Values
-Some visualizations require a single column to be plotted on the x or y axis. For example, there is no default scatter plot and Python informs us that both x and y are required:
-df.plot.scatter()
-TypeError: scatter() missing 2 required positional arguments: 'x' and 'y'
-Python error message when df.plot.scatter() does not specify the columns names to be used 
-for x and y axes.
-When Python informs us that we're missing "missing 2 required positional arguments", 
-we need to specify them in the function call. For all visualizations, the x and y values will be the name of the column to be used.
- If we wanted to create a scatter plot of the IlliniScore verses the OpponentScore:
-df = pd.read_csv("https://waf.cs.illinois.edu/discovery/football.csv")
-df.plot.scatter(x="IlliniScore", y="OpponentScore")
- 
-Scatter plot with the IlliniScore on the x axis and the OpponentScore on the y axis.
-Chart-Specific Options
-While this visualization is good, there's almost too much data for a scatter plot! Another plot, a hexbin,
- provides a heat map for of density of each region of a scatter plot. Switching out the .scatter 
-for .hexbin, we get a completely different visualization:
-df = pd.read_csv("https://waf.cs.illinois.edu/discovery/football.csv")
-df.plot.hexbin(x="IlliniScore", y="OpponentScore")
- 
-Hexbin plot with the IlliniScore on the x axis and the OpponentScore on the y axis.
+## Aim
+
+To analyse a large real-world COVID-19 dataset using Python by performing data exploration and visualizing key trends through various plots such as line graph, bar chart, pie chart, scatter plot, and histogram for meaningful insights.
+
+## Algorithm
+
+### 1. Import libraries: Pandas, Matplotlib, and NumPy.
+
+### 2. Load dataset covid_cases.csv using Pandas.
+
+### 3. Explore dataset:
+
+Display first few rows
+
+Show dataset shape
+
+Display column names
+
+Check and handle missing values
+
+### 4. Basic data analysis:
+
+Total number of records
+
+Statistical summary using describe()
+
+### 5. Data preprocessing:
+
+Convert date column into datetime format (if present)
+
+Group data by date for global trend
+
+Group by country for top affected countries
+
+### 6. Visualizations using Matplotlib:
+
+Line Graph: Global trend of confirmed cases over time
+
+Bar Chart: Top 10 countries by confirmed cases
+
+Pie Chart: Case distribution of top 5 countries
+
+Scatter Plot: Confirmed vs. Deaths
+
+Histogram: Distribution of active cases
+
+### 7. Label charts: Add titles, axis labels, legends, colors
+
+### 8. Display all graphs
+
+### 9. End
+
+```Python
+import pandas as pd
+import matplotlib.pyplot as plt
+import numpy as np
+```
+
+### Step 1: Load Dataset
+```Python
+df = pd.read_csv("covid_cases.csv")
+```
+
+### Step 2: Explore Dataset
+```Python
+print("\n----- First 5 Rows -----")
+print(df.head())
+
+print("\n----- Dataset Shape -----")
+print(df.shape)
+
+print("\n----- Column Names -----")
+print(df.columns)
+
+print("\n----- Missing Values -----")
+print(df.isnull().sum())
+
+# Handle missing values (optional)
+df = df.fillna(0)
+```
+### Step 3: Basic Exploration
+```Python
+
+print("\n----- Total Records -----")
+print(len(df))
+
+print("\n----- Statistical Summary -----")
+print(df.describe())
+```
+
+### Step 4: Data Preprocessing
+```Python
+
+# Convert date column if present
+if 'Date' in df.columns:
+    df['Date'] = pd.to_datetime(df['Date'])
+
+# Global trend (confirmed cases per date)
+if 'Date' in df.columns and 'Confirmed' in df.columns:
+    global_trend = df.groupby('Date')['Confirmed'].sum()
+
+# Top 10 countries by total confirmed cases
+if 'Country' in df.columns and 'Confirmed' in df.columns:
+    top10 = df.groupby('Country')['Confirmed'].sum().sort_values(ascending=False).head(10)
+
+# Top 5 countries for pie chart
+top5 = top10.head(5)
+```
+
+### Step 5: Visualization
+```Python
+# 1. Line Graph – Global Confirmed Trend
+plt.figure(figsize=(10,5))
+plt.plot(global_trend.index, global_trend.values)
+plt.title("Global Trend of Confirmed COVID-19 Cases Over Time")
+plt.xlabel("Date")
+plt.ylabel("Total Confirmed Cases")
+plt.grid(True)
+plt.show()
+
+# 2. Bar Chart – Top 10 Countries by Confirmed Cases
+plt.figure(figsize=(10,5))
+plt.bar(top10.index, top10.values)
+plt.title("Top 10 Countries by Confirmed COVID-19 Cases")
+plt.xlabel("Country")
+plt.ylabel("Total Confirmed Cases")
+plt.xticks(rotation=45)
+plt.show()
+
+# 3. Pie Chart – Top 5 Affected Countries
+plt.figure(figsize=(8,8))
+plt.pie(top5.values, labels=top5.index, autopct='%1.1f%%')
+plt.title("Case Distribution of Top 5 Affected Countries")
+plt.show()
+
+# 4. Scatter Plot – Confirmed vs Deaths
+plt.figure(figsize=(8,6))
+plt.scatter(df['Confirmed'], df['Deaths'])
+plt.title("Scatter Plot: Confirmed Cases vs Deaths")
+plt.xlabel("Confirmed Cases")
+plt.ylabel("Deaths")
+plt.grid(True)
+plt.show()
+
+# 5. Histogram – Distribution of Active Cases
+if 'Active' in df.columns:
+    plt.figure(figsize=(8,6))
+    plt.hist(df['Active'], bins=20)
+    plt.title("Histogram of Active COVID-19 Cases")
+    plt.xlabel("Active Cases")
+    plt.ylabel("Frequency")
+    plt.show()
+else:
+    print("\nNo 'Active' column found in dataset for Histogram.")
+```
+
 
